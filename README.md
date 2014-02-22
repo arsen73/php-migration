@@ -7,12 +7,14 @@
 	~$ php console.php
 
 
-	run 			 		выполнит все миграции 
+	create [name_migration] 		выполнит все миграции
 
-	run name_migration 	 	выполнит одну миграцию 
+	run 			 				выполнит все миграции 
 
-	down 			 	 	откатит все миграции 
+	run name_migration 			 	выполнит одну миграцию 
 
-	down name_migration 	откатит одну миграцию 
+	down 			 			 	откатит все миграции 
 
-	list 			 		покажет сипоск миграций 
+	down name_migration 			откатит одну миграцию 
+
+	list 			 				покажет сипоск миграций 
