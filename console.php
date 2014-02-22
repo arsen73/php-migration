@@ -3,6 +3,7 @@
 include_once __DIR__ . '/class/autoload.php';
 if(count($argv)==1){
 	echo "
+	create [name_migration] \t создаст файл миграции \n\r
 	run \t\t\t выполнит все миграции \n\r
 	run name_migration \t выполнит одну миграцию \n\r
 	down \t\t\t откатит все миграции \n\r
@@ -30,6 +31,11 @@ switch ($argv[1]) {
 
 	case 'list':
 		$m->printListMigration();
+		break;
+
+	case 'create':
+		$name = isset($argv[2]) ? $argv[2] : "";
+		$m->createMigration($name);
 		break;
 	
 	default:
