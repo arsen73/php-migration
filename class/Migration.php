@@ -7,9 +7,12 @@ class Migration {
 	private $cdb;
 	private $sql;
 
+  private $listMigration;
+
 	public function __construct(){
-		$this->config = include __DIR__ . '/config.php';
+		$this->config = include dirname(__FILE__). '/config.php';
 		$this->connection();
+    $this->CheckORCreateServiceTable();
 	}
 
 	/**
@@ -108,7 +111,7 @@ class Migration {
 	protected function searchMigration(){
 		$list_file = scandir($this->getConfig('migration_path'));
 		foreach ($list_file as $k=>$file) {
-			if($file == '.' || $file == '..'){
+			if($file == '.' || $file == '..' || in_array($file, $this->listMigration)){
 				unset($list_file[$k]);
 			}
 		}
@@ -164,6 +167,7 @@ class Migration {
 			case 'up':
 				$m->up();
 				$m->sql_exec();
+        $this->addExecMigration($fileName);
 				break;
 			
 			case 'down':
@@ -183,4 +187,29 @@ class Migration {
 	public function up(){}
 
 	public function down(){}
+
+  /**
+   * Проверяет наличие таблицы с миграциями, если таблицв нет создаёт
+   */
+  private function CheckORCreateServiceTable(){
+    $sql = "CREATE TABLE IF NOT EXISTS `migrationTable` (
+			  `migrationId` int(11) NOT NULL,
+			  `name` varchar(512) NOT NULL,
+			  `status` varchar(256) NOT NULL
+			) ENGINE=InnoDB DEFAULT CHARSET=cp1251;";
+    $this->cdb->exec( $sql );
+    $sql = "SELECT `name`, `status` FROM `migrationTable`";
+    $this->listMigration = array();
+    foreach($this->cdb->query($sql) as $row) {
+      $this->listMigration[] = $row['name'];
+    }
+  }
+
+  /**
+   * Добавляет выполненую миграцию в список выполненых
+   */
+  private function addExecMigration($name){
+    $sql = "INSERT INTO `migrationTable`(`name`, `status`) VALUES ('".$name."', 'exec')";
+    $this->cdb->exec( $sql );
+  }
 }
